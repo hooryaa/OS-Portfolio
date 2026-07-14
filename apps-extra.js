@@ -888,7 +888,7 @@ function initWidgets(){
   stack.style.position = "absolute";
   stack.style.inset = "0";
   stack.style.zIndex = "20";
-  stack.style.pointerEvents = "none";
+  stack.style.pointerEvents = "auto";
   stack.style.overflow = "visible";
   stack.style.background = "transparent";
   stack.innerHTML = "";
@@ -1072,7 +1072,8 @@ function initWidgets(){
       moveTo(origX + e.clientX - startX, origY + e.clientY - startY);
     };
     const onMouseUp = ()=>{
-      if(!dragging) return endDrag();
+      if(!dragging) return;
+      endDrag();
     };
 
     const onTouchStart = e=>{

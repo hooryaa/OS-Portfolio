@@ -257,7 +257,7 @@ a{color:inherit;}
   cursor:pointer;
 }
 .desktop-hero-btn.primary{background:linear-gradient(90deg,var(--violet),var(--cyan));color:#fff;border-color:transparent;}
-#windows-layer{position:absolute;inset:0;top:34px;z-index:30;pointer-events:auto;} 
+#windows-layer{position:absolute;inset:0;top:34px;z-index:30;pointer-events:none;} 
 #desktop-widgets{z-index:20;pointer-events:auto;}
 .dicon{
   width:76px;display:flex;flex-direction:column;align-items:center;gap:7px;
