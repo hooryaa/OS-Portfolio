@@ -1,0 +1,95 @@
+/* ============================================================
+   HOORIA OS — STYLES V2 (upgrade layer)
+   Theme variables are swapped at runtime via themes.js by
+   setting CSS custom properties on :root — everything below
+   just adds new UI surfaces introduced in the upgrade.
+   ============================================================ */
+
+body[data-theme]{ transition: background-color .3s ease; }
+
+/* ---- Power menu ---- */
+#power-menu{
+  position:fixed; top:34px; right:16px; z-index:96;
+  background:rgba(22,22,26,.96); border:1px solid var(--border-hi); border-radius:12px;
+  padding:6px; min-width:180px; display:none; box-shadow:0 20px 50px -10px rgba(0,0,0,.6);
+  backdrop-filter:blur(18px);
+  opacity:0; transform:translateY(-10px); transition:opacity .18s ease, transform .18s ease;
+}
+#power-menu.show{ display:block; opacity:1; transform:translateY(0); }
+#power-menu .ctx-item{ font-size:12.5px; }
+
+/* ---- Shutdown screen ---- */
+#shutdown-screen{
+  position:fixed; inset:0; z-index:200; background:#000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  opacity:0; pointer-events:none; transition:opacity .5s ease;
+}
+#shutdown-screen.show{ opacity:1; pointer-events:auto; }
+#shutdown-screen .ss-msg{ font-family:var(--font-mono); font-size:13px; color:#666; opacity:0; transition:opacity .6s ease .4s; }
+#shutdown-screen.dark .ss-msg{ opacity:1; }
+#shutdown-screen .ss-btn{
+  font-family:var(--font-mono); font-size:12px; color:#888; background:none; border:1px solid #333;
+  padding:8px 16px; border-radius:8px; cursor:pointer; opacity:0; transition:opacity .6s ease .6s; pointer-events:none;
+}
+#shutdown-screen.dark .ss-btn{ opacity:1; pointer-events:auto; }
+#shutdown-screen .ss-btn:hover{ border-color:#666; color:#fff; }
+
+/* ---- Desktop widgets ---- */
+#desktop-widgets{
+  position:absolute; inset:0; z-index:20;
+  pointer-events:none;
+  overflow:visible;
+}
+#desktop-widgets > div{ pointer-events:auto; }
+.widget-card{
+  position:absolute;
+  width:220px;
+  min-height:92px;
+  background:rgba(20,20,24,.88);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:14px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 44px rgba(0,0,0,.22);
+  transition:transform .18s ease, box-shadow .18s ease;
+  cursor:grab;
+}
+.widget-card:active{transform:scale(1.01);cursor:grabbing;}
+.widget-card-header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;cursor:grab;
+}
+.widget-card-drag-handle{font-size:12px;color:var(--text-2);}
+@media (max-width: 1200px){ #desktop-widgets{ display:block !important; } }
+
+/* ---- Dev Mode (Konami code) ---- */
+body.dev-mode #desktop::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:8;
+  background:repeating-linear-gradient(0deg, rgba(0,229,199,.035) 0px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay;
+}
+body.dev-mode .tb-brand{ color:var(--cyan); text-shadow:0 0 12px rgba(0,229,199,.5); }
+body.dev-mode #topbar{ border-bottom-color:var(--cyan); }
+
+/* ---- Print (Resume) ---- */
+@media print{
+  body *{ visibility:hidden; }
+  #resume-print-area, #resume-print-area *{ visibility:visible; }
+  #resume-print-area{ position:absolute; left:0; top:0; width:100%; background:#fff; color:#111; padding:20px; }
+  #resume-print-area .app-sub, #resume-print-area p, #resume-print-area span{ color:#333 !important; }
+}
+.dock-item[data-app="settings"]{ font-size:17px; }
+#dock{ max-width:92vw; overflow-x:auto; scrollbar-width:none; }
+#dock::-webkit-scrollbar{ display:none; }
+
+/* ---- Cursor glow ---- */
+#cursor-glow{
+  position:fixed; top:0; left:0; width:260px; height:260px; margin:-130px 0 0 -130px;
+  border-radius:50%; pointer-events:none; z-index:3;
+  background:radial-gradient(circle, rgba(124,92,255,.10) 0%, rgba(0,229,199,.04) 45%, transparent 70%);
+  will-change:transform;
+}
+@media (max-width:760px), (pointer:coarse){ #cursor-glow{ display:none !important; } }
+
+/* ---- Topbar system indicators ---- */
+#wifi-indicator svg, #battery-indicator svg{ width:16px; height:16px; }
+#battery-indicator{ display:flex; align-items:center; }
