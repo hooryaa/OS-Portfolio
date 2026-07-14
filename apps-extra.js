@@ -1059,36 +1059,96 @@ function initWidgets(){
   }
   function makeWidgetDraggable(card, id){
     let dragging=false, startX=0, startY=0, origX=0, origY=0;
-    card.addEventListener("mousedown", e=>{
+    // ensure card is keyboard-focusable
+    if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex','0');
+
+    const onMouseDown = e=>{
       if(e.button !== 0) return;
       if(e.target.closest("a,button")) return;
+      startDrag(e.clientX, e.clientY);
+    };
+    const onMouseMove = e=>{
+      if(!dragging) return;
+      moveTo(origX + e.clientX - startX, origY + e.clientY - startY);
+    };
+    const onMouseUp = ()=>{
+      if(!dragging) return endDrag();
+    };
+
+    const onTouchStart = e=>{
+      if(e.touches.length > 1) return; // ignore multi-touch
+      const t = e.touches[0];
+      if(e.target.closest("a,button")) return;
+      startDrag(t.clientX, t.clientY);
+      // prevent native gestures while dragging
+      e.preventDefault();
+    };
+    const onTouchMove = e=>{
+      if(!dragging) return;
+      const t = e.touches[0];
+      moveTo(origX + t.clientX - startX, origY + t.clientY - startY);
+      e.preventDefault();
+    };
+    const onTouchEnd = ()=>{ if(dragging) endDrag(); };
+
+    function startDrag(x,y){
       dragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
+      startX = x; startY = y;
       const rect = card.getBoundingClientRect();
-      origX = rect.left;
-      origY = rect.top;
+      origX = rect.left; origY = rect.top;
       card.style.transition = "none";
       card.style.cursor = "grabbing";
       card.style.zIndex = "999";
       document.body.style.userSelect = "none";
-    });
-    window.addEventListener("mousemove", e=>{
-      if(!dragging) return;
-      const nextX = Math.min(window.innerWidth - card.offsetWidth - 8, Math.max(8, origX + e.clientX - startX));
-      const nextY = Math.min(window.innerHeight - card.offsetHeight - 8, Math.max(44, origY + e.clientY - startY));
+    }
+    function moveTo(rawX, rawY){
+      const nextX = Math.min(window.innerWidth - card.offsetWidth - 8, Math.max(8, rawX));
+      const nextY = Math.min(window.innerHeight - card.offsetHeight - 8, Math.max(44, rawY));
       card.style.left = `${nextX}px`;
       card.style.top = `${nextY}px`;
-    });
-    window.addEventListener("mouseup", ()=>{
-      if(!dragging) return;
+    }
+    function endDrag(){
       dragging = false;
       card.style.transition = "transform .18s ease, box-shadow .18s ease";
       card.style.cursor = "grab";
       card.style.zIndex = "20";
       document.body.style.userSelect = "";
       saveWidgetPosition(id, parseInt(card.style.left,10), parseInt(card.style.top,10));
+    }
+
+    // mouse
+    card.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    // touch (non-passive to allow preventDefault)
+    card.addEventListener("touchstart", onTouchStart, {passive:false});
+    window.addEventListener("touchmove", onTouchMove, {passive:false});
+    window.addEventListener("touchend", onTouchEnd);
+
+    // keyboard repositioning: arrow keys move, shift = big step
+    card.addEventListener('keydown', e=>{
+      const step = e.shiftKey ? 32 : 8;
+      let moved = false;
+      const left = parseInt(card.style.left,10) || 0;
+      const top = parseInt(card.style.top,10) || 0;
+      if(e.key === 'ArrowLeft'){ moveTo(left - step, top); moved = true; }
+      if(e.key === 'ArrowRight'){ moveTo(left + step, top); moved = true; }
+      if(e.key === 'ArrowUp'){ moveTo(left, top - step); moved = true; }
+      if(e.key === 'ArrowDown'){ moveTo(left, top + step); moved = true; }
+      if(moved){
+        e.preventDefault();
+        saveWidgetPosition(id, parseInt(card.style.left,10), parseInt(card.style.top,10));
+      }
     });
+
+    // expose a small drag handle activation (space/enter on handle starts move by keyboard)
+    const handle = card.querySelector('.widget-card-drag-handle');
+    if(handle){
+      handle.setAttribute('tabindex','0');
+      handle.addEventListener('keydown', ev=>{
+        if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); card.focus(); }
+      });
+    }
   }
 
   const saved = localStorage.getItem("hooria-os-widgets");
@@ -1104,7 +1164,7 @@ function widgetCard(icon, title, content, onclick){
       el("div", {style:"display:flex;align-items:center;gap:8px;color:var(--text-2);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--font-mono);"},
         el("span", {}, icon), title
       ),
-      el("span", {class:"widget-card-drag-handle", title:"Drag to move"}, "⠿")
+      el("span", {class:"widget-card-drag-handle", title:"Drag to move", tabindex:"0", role:"button", 'aria-label':"Drag widget"}, "⠿")
     ),
     content
   );

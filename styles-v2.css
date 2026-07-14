@@ -37,7 +37,7 @@ body[data-theme]{ transition: background-color .3s ease; }
 /* ---- Desktop widgets ---- */
 #desktop-widgets{
   position:absolute; inset:0; z-index:20;
-  pointer-events:none;
+  pointer-events:auto;
   overflow:visible;
 }
 #desktop-widgets > div{ pointer-events:auto; }
@@ -59,6 +59,10 @@ body[data-theme]{ transition: background-color .3s ease; }
   display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;cursor:grab;
 }
 .widget-card-drag-handle{font-size:12px;color:var(--text-2);}
+/* Keyboard focus styles for accessibility */
+.widget-card:focus-visible{ outline:2px solid rgba(124,92,255,.22); outline-offset:4px; }
+.widget-card-drag-handle{ cursor:grab; border-radius:6px; padding:4px; }
+.widget-card-drag-handle:focus-visible{ box-shadow:0 6px 18px rgba(124,92,255,.12); outline:2px solid rgba(124,92,255,.38); outline-offset:2px; }
 @media (max-width: 1200px){ #desktop-widgets{ display:block !important; } }
 
 /* ---- Dev Mode (Konami code) ---- */
