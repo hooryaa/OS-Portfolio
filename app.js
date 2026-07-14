@@ -84,6 +84,18 @@ function fmtDate(d){
   return d.toLocaleDateString([], {weekday:'long', month:'long', day:'numeric'});
 }
 function esc(s){ const d=document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function bindKeyboardAction(el, handler){
+  if(!el) return;
+  if(el.tagName === "BUTTON" || el.tagName === "A" || el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") return;
+  el.setAttribute("role", "button");
+  if(!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+  el.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      handler(e);
+    }
+  });
+}
 
 /* ---------------- clock ---------------- */
 function tickClocks(){
@@ -354,8 +366,10 @@ function renderProjects(container, route){
   const wrap = el("div", {class:"app"});
   if(route && route.project){
     const p = CONTENT.projects.find(x=>x.id === route.project);
+    const backLink = el("div", {class:"back-link", tabindex:"0", role:"button", onclick:()=>renderAppRoute("projects", {})}, "← All projects");
+    bindKeyboardAction(backLink, ()=>renderAppRoute("projects", {}));
     wrap.appendChild(el("div", {class:"app-scroll"},
-      el("div", {class:"back-link", onclick:()=>renderAppRoute("projects", {})}, "← All projects"),
+      backLink,
       el("span", {class:"eyebrow"}, p.tag),
       el("h1", {class:"app-h"}, p.name),
       el("p", {class:"app-sub"}, p.summary),
@@ -386,15 +400,17 @@ function renderProjects(container, route){
     wrap.appendChild(el("div", {class:"app-scroll"},
       el("span", {class:"eyebrow"}, "Selected work"),
       el("h1", {class:"app-h"}, "Projects"),
-      el("p", {class:"app-sub"}, "Seven real projects — the problem, the architecture, and what I actually learned building each one."),
-      el("div", {class:"proj-grid"}, CONTENT.projects.map(p=>
-        el("div", {class:"proj-card", tabindex:"0", onclick:()=>renderAppRoute("projects", {project:p.id})},
+      el("p", {class:"app-sub"}, "Selected work across data engineering, analytics, and developer tooling — the problem, the architecture, and the tradeoffs behind each build."),
+      el("div", {class:"proj-grid"}, CONTENT.projects.map(p=>{
+        const card = el("div", {class:"proj-card", tabindex:"0", onclick:()=>renderAppRoute("projects", {project:p.id})},
           el("span", {class:"proj-tag"}, p.tag),
           el("h3", {}, `${p.glyph}  ${p.name}`),
           el("p", {}, p.summary),
           el("div", {class:"proj-stack"}, p.stack.slice(0,4).map(s=>el("span",{class:"chip"},s)))
-        )
-      ))
+        );
+        bindKeyboardAction(card, ()=>renderAppRoute("projects", {project:p.id}));
+        return card;
+      }))
     ));
   }
   container.appendChild(wrap);
@@ -693,8 +709,10 @@ function renderBlog(container, route){
   const wrap = el("div", {class:"app"});
   if(route && route.post){
     const p = CONTENT.blog.find(x=>x.id===route.post);
+    const backLink = el("div", {class:"back-link", tabindex:"0", role:"button", onclick:()=>renderAppRoute("blog",{})}, "← All posts");
+    bindKeyboardAction(backLink, ()=>renderAppRoute("blog",{}));
     wrap.appendChild(el("div", {class:"app-scroll"},
-      el("div", {class:"back-link", onclick:()=>renderAppRoute("blog",{})}, "← All posts"),
+      backLink,
       el("span", {class:"eyebrow"}, `${p.date} · ${p.readTime} read`),
       el("h1", {class:"app-h"}, p.title),
       el("div", {class:"blog-body"}, el("p",{},p.body))
@@ -704,15 +722,17 @@ function renderBlog(container, route){
       el("span", {class:"eyebrow"}, "Field notes"),
       el("h1", {class:"app-h"}, "Blog"),
       el("p", {class:"app-sub"}, "Short essays on AI, architecture, and what building these projects actually taught me."),
-      el("div", {class:"blog-list"}, CONTENT.blog.map(p=>
-        el("div", {class:"blog-row", onclick:()=>renderAppRoute("blog",{post:p.id})},
+      el("div", {class:"blog-list"}, CONTENT.blog.map(p=>{
+        const row = el("div", {class:"blog-row", tabindex:"0", onclick:()=>renderAppRoute("blog",{post:p.id})},
           el("div", {},
             el("h4", {}, p.title),
             el("div", {class:"blog-meta"}, `${p.date} · ${p.readTime} read`)
           ),
           el("span", {}, "→")
-        )
-      ))
+        );
+        bindKeyboardAction(row, ()=>renderAppRoute("blog",{post:p.id}));
+        return row;
+      }))
     ));
   }
   container.appendChild(wrap);
@@ -836,6 +856,7 @@ function initDock(){
       el("div", {class:"dock-tooltip"}, meta.title),
       el("div", {class:"dock-dot"})
     );
+    bindKeyboardAction(item, ()=>openApp(id));
     dock.appendChild(item);
   });
 }
@@ -877,10 +898,12 @@ function initSpotlight(){
     results.innerHTML = "";
     if(!filtered.length){ results.appendChild(el("div",{class:"spot-empty"},"No matches. Try 'projects' or 'blog'.")); return; }
     filtered.forEach((r,i)=>{
-      results.appendChild(el("div", {class:`spot-item ${i===activeI?'active':''}`, onclick:()=>{ r.action(); close(); }},
+      const item = el("div", {class:`spot-item ${i===activeI?'active':''}`, tabindex:"0", onclick:()=>{ r.action(); close(); }},
         el("div",{class:"si-glyph"}, r.glyph),
         el("div",{class:"si-text"}, el("b",{},r.title), el("span",{},r.sub))
-      ));
+      );
+      bindKeyboardAction(item, ()=>{ r.action(); close(); });
+      results.appendChild(item);
     });
   }
   input.addEventListener("input", ()=>{
@@ -1144,13 +1167,25 @@ function initMobile(){
     el("div", {class:"m-brand"}, el("span",{class:"dot"}), "Hooria OS"),
     el("div", {class:"m-time", "data-clock":""}, fmtTime(new Date()))
   ));
+  const intro = el("div", {class:"m-intro"},
+    el("div", {class:"m-intro-label"}, "AI • Data Engineering • BI"),
+    el("h2", {}, "Hooria Amir"),
+    el("p", {}, "Software engineer building data pipelines, analytics platforms, and AI-assisted tooling."),
+    el("div", {class:"m-intro-actions"},
+      el("button", {class:"m-intro-btn primary", onclick:()=>openMobile("projects")}, "Projects"),
+      el("button", {class:"m-intro-btn", onclick:()=>openMobile("resume")}, "Resume")
+    )
+  );
+  root.appendChild(intro);
   const list = el("div", {class:"m-list"});
   Object.keys(APPS).forEach(id=>{
     const meta = APPS[id];
-    list.appendChild(el("div", {class:"m-row", onclick:()=>openMobile(id)},
+    const row = el("div", {class:"m-row", tabindex:"0", onclick:()=>openMobile(id)},
       el("div", {class:"m-glyph"}, meta.glyph),
       el("div", {}, el("b",{},meta.title), el("span",{}, mobileSub(id)))
-    ));
+    );
+    bindKeyboardAction(row, ()=>openMobile(id));
+    list.appendChild(row);
   });
   root.appendChild(list);
   document.body.appendChild(buildMobileFullScreens());
@@ -1184,19 +1219,23 @@ function buildMobileFullScreens(){
 }
 function initSwipeToClose(screen, handle){
   let sy=0, dy=0, dragging=false;
-  handle.addEventListener("touchstart", (e)=>{ sy = e.touches[0].clientY; dragging=true; screen.style.transition="none"; }, {passive:true});
+  handle.addEventListener("touchstart", (e)=>{ sy = e.touches[0].clientY; dragging=true; screen.style.transition="none"; screen.style.willChange="transform"; }, {passive:true});
   handle.addEventListener("touchmove", (e)=>{
     if(!dragging) return;
-    dy = Math.max(0, e.touches[0].clientY - sy);
+    const delta = e.touches[0].clientY - sy;
+    if(delta < 0) return;
+    dy = Math.min(160, Math.max(0, delta));
     screen.style.transform = `translateY(${dy}px)`;
-  }, {passive:true});
+    if(dy > 6) e.preventDefault();
+  }, {passive:false});
   handle.addEventListener("touchend", ()=>{
     dragging = false;
     screen.style.transition = "";
+    screen.style.willChange = "";
+    if(dy > 92) screen.classList.remove("open");
     screen.style.transform = "";
-    if(dy > 100) screen.classList.remove("open");
     dy = 0;
-  });
+  }, {passive:true});
 }
 function openMobile(appId, opts={}){
   const screen = $(`#mfull-${appId}`);
@@ -1232,12 +1271,43 @@ window.addEventListener("DOMContentLoaded", ()=>{
   $("#profile-initial").textContent = CONTENT.profile.initials;
   $("#profile-name").textContent = CONTENT.profile.name;
 
+  const desktopHero = $("#desktop-hero");
+  if(desktopHero){
+    $all("[data-action]", desktopHero).forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const action = btn.dataset.action;
+        if(action === "projects") openApp("projects");
+        else if(action === "resume") openApp("resume");
+        else if(action === "contact") openApp("contact");
+      });
+    });
+  }
+
+  function clearDesktopSelection(){
+    $all(".dicon.selected").forEach(icon=> icon.classList.remove("selected"));
+  }
+
+  const desktop = $("#desktop");
+  desktop.addEventListener("click", (e)=>{
+    if(e.target === desktop || e.target.id === "desktop-widgets" || e.target.id === "windows-layer"){
+      clearDesktopSelection();
+    }
+  });
+
   // desktop icons open a couple of "signature" apps directly
   $all(".dicon").forEach(d=>{
-    d.addEventListener("click", ()=> openApp(d.dataset.app));
+    d.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      clearDesktopSelection();
+      d.classList.add("selected");
+      openApp(d.dataset.app);
+    });
     d.addEventListener("keydown", e=>{
       if(e.key === "Enter" || e.key === " "){
-        e.preventDefault(); openApp(d.dataset.app);
+        e.preventDefault();
+        clearDesktopSelection();
+        d.classList.add("selected");
+        openApp(d.dataset.app);
       }
     });
   });

@@ -3,8 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Hooria OS — AI Software Engineer</title>
-<meta name="description" content="Hooria OS — an interactive portfolio operating system by an AI Software Engineer. Explore projects, architecture, and more as apps in a fictional desktop OS.">
+<meta name="theme-color" content="#0A0A0D">
+<meta name="description" content="Explore Hooria Amir's interactive portfolio OS featuring AI, data engineering, analytics, ETL pipelines, software engineering projects, architecture diagrams, and technical case studies.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hooria Amir | Interactive Portfolio OS">
+<meta property="og:description" content="Explore my AI, data engineering, analytics, and software engineering projects inside an interactive desktop operating system.">
+<meta property="og:url" content="https://hooria-portfolio.vercel.app">
+<meta property="og:image" content="https://hooria-portfolio.vercel.app/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hooria Amir | Interactive Portfolio OS">
+<meta name="twitter:description" content="Interactive portfolio featuring AI, data engineering, analytics, and software engineering projects.">
+<meta name="twitter:image" content="https://hooria-portfolio.vercel.app/preview.png">
+<meta property="og:site_name" content="Hooria Amir Portfolio">
+<link rel="canonical" href="https://hooria-portfolio.vercel.app">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Hooria Amir",
+  "jobTitle": "Software Engineer",
+  "description": "Software engineer building data engineering pipelines, analytics platforms, and AI-assisted tooling.",
+  "url": "https://hooria-portfolio.vercel.app",
+  "sameAs": [
+    "https://github.com/hooryaa",
+    "https://linkedin.com/in/hooryaa"
+  ]
+}
+</script>
+<title>Hooria Amir | AI & Data Engineer | Interactive Portfolio OS</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230A0A0D'/%3E%3Ccircle cx='50' cy='50' r='26' fill='none' stroke='%237C5CFF' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='9' fill='%2300E5C7'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles-v2.css">
@@ -94,7 +120,20 @@
   </div>
 
   <!-- ===================== DESKTOP ===================== -->
-  <div id="desktop">
+  <div id="desktop" role="main" aria-label="Desktop workspace">
+    <div id="desktop-hero" class="desktop-hero" aria-label="Quick profile summary">
+      <div class="desktop-hero-badge">AI • Data Engineering • BI</div>
+      <h1>Hooria Amir</h1>
+      <p>Software Engineer building data pipelines, analytics platforms, and AI-assisted tooling for real-world impact.</p>
+      <div class="desktop-hero-tags">
+        <span>Python</span><span>ETL</span><span>Power BI</span><span>TypeScript</span>
+      </div>
+      <div class="desktop-hero-actions">
+        <button class="desktop-hero-btn primary" data-action="projects">Explore projects</button>
+        <button class="desktop-hero-btn" data-action="resume">View resume</button>
+        <button class="desktop-hero-btn" data-action="contact">Contact</button>
+      </div>
+    </div>
     <div id="desktop-icons">
       <div class="dicon" data-app="projects" tabindex="0" title="Open Projects" aria-label="Open Projects" data-tooltip="Open Projects"><div class="dicon-glyph">◆</div><div class="dicon-label">Projects</div></div>
       <div class="dicon" data-app="terminal" tabindex="0" title="Open Terminal" aria-label="Open Terminal" data-tooltip="Open Terminal"><div class="dicon-glyph">❯</div><div class="dicon-label">Terminal</div></div>
